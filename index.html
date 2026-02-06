@@ -1,12 +1,13 @@
-
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>하트빌리지 프라이빗 리포트</title>
+    <title>하트빌리지 프라이빗 리포트 (Mobile)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonts: Noto Serif for Luxury, Great Vibes for Handwriting -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;400;600;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Great+Vibes&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Great+Vibes&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -55,65 +56,66 @@
         }
     </script>
     <style>
-        body { background-color: #0a0c0b; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background-color: #0a0c0b; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; }
         
         /* SCENE CONTROLLER */
-        .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; transition: all 1s ease-in-out; }
+        .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 1s ease-in-out; padding: 20px; }
         .scene-hidden { opacity: 0; pointer-events: none; z-index: -1; transform: scale(1.1); filter: blur(10px); }
         
-        /* ENVELOPE STYLES */
+        /* ENVELOPE STYLES (Vertical Optimized) */
         .envelope-container { 
             perspective: 1000px; 
-            width: 340px; 
-            max-width: 85vw; /* Mobile Responsive Fix */
-            height: 240px; 
+            width: 80vw; /* Responsive Width */
+            max-width: 320px;
+            aspect-ratio: 1.4 / 1; /* Maintain Ratio */
             position: relative; 
             cursor: pointer; 
+            margin: 40px 0; /* Spacing */
         }
         .envelope {
             position: relative; width: 100%; height: 100%; background: #1a2e1b;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6); border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7); border-radius: 8px;
             transform-style: preserve-3d; transition: transform 0.6s;
             display: flex; justify-content: center; align-items: center;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
         }
         .envelope::before { /* Texture */
             content: ''; position: absolute; inset: 0; 
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23ffffff' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
             pointer-events: none;
         }
         .flap {
             position: absolute; top: 0; left: 0; width: 100%; height: 52%;
             background: #233d25; transform-origin: top; transition: transform 0.6s 0.2s, z-index 0.2s;
             z-index: 10; clip-path: polygon(0 0, 50% 100%, 100% 0);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         .envelope.open .flap { transform: rotateX(180deg); z-index: 0; }
         
         .wax-seal {
-            width: 65px; height: 65px; 
+            width: 60px; height: 60px; 
             background: radial-gradient(circle at 30% 30%, #e6cf8b, #c5a059, #8a6e30);
-            border-radius: 50%; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            border-radius: 50%; position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
             z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.4);
             display: flex; justify-content: center; align-items: center;
             border: 3px solid #8a6e30; transition: all 0.3s;
         }
-        .wax-seal i { font-size: 28px; color: #423210; filter: drop-shadow(0 1px 0 rgba(255,255,255,0.3)); }
+        .wax-seal i { font-size: 24px; color: #423210; filter: drop-shadow(0 1px 0 rgba(255,255,255,0.3)); }
         .envelope:hover .wax-seal { transform: translate(-50%, -50%) scale(1.1); }
         .envelope.open .wax-seal { opacity: 0; transform: translate(-50%, -50%) scale(1.5); pointer-events: none; }
 
         .letter-preview {
-            position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+            position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
             background: #fdfbf7; border-radius: 4px; z-index: 5;
-            transform: translateY(50px) scale(0.9); transition: transform 0.8s 0.5s; opacity: 0;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            transform: translateY(30px) scale(0.9); transition: transform 0.8s 0.5s; opacity: 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;
         }
-        .envelope.open .letter-preview { transform: translateY(-120px) scale(1); opacity: 1; }
+        .envelope.open .letter-preview { transform: translateY(-120%) scale(1); opacity: 0; /* Fade out as it opens */ }
 
         /* REPORT PAPER STYLES */
         .report-paper {
-            background-color: #fdfbf7; width: 100%; max-width: 500px; height: 100%;
+            background-color: #fdfbf7; width: 100%; height: 100%;
             overflow-y: auto; position: relative;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
@@ -130,7 +132,7 @@
         
         /* Section Decor */
         .section-divider {
-            display: flex; align-items: center; justify-content: center; margin: 40px 0;
+            display: flex; align-items: center; justify-content: center; margin: 30px 0;
         }
         .section-divider::before, .section-divider::after {
             content: ''; height: 1px; width: 60px; background: #c5a059; margin: 0 15px; opacity: 0.5;
@@ -154,17 +156,20 @@
 </head>
 <body>
 
-    <!-- SCENE 1: THE ENVELOPE -->
+    <!-- SCENE 1: THE ENVELOPE (Vertical Layout) -->
     <div id="scene-envelope" class="scene bg-[url('https://www.transparenttextures.com/patterns/black-felt.png')]">
-        <div class="text-center mb-16 animate-fade-in px-6">
-            <p class="text-hb-gold font-eng text-[10px] tracking-[0.4em] uppercase mb-6 opacity-80">Private Consulting Report</p>
-            <h1 class="font-serif text-3xl md:text-5xl leading-relaxed tracking-wide font-light text-white">
-                <span class="font-bold intro-text-gradient">백해림</span> 님께 도착한<br>
-                <span class="italic font-normal text-white/90">세포 분석 결과서</span>
+        
+        <!-- Text Top -->
+        <div class="text-center animate-fade-in z-10 mt-[-40px]">
+            <p class="text-hb-gold font-eng text-[10px] tracking-[0.3em] uppercase mb-4 opacity-80">Private Consulting Report</p>
+            <h1 class="font-serif text-3xl leading-relaxed tracking-wide font-light text-white">
+                <span class="font-bold intro-text-gradient text-4xl block mb-2">백해림</span> 님께 도착한<br>
+                <span class="italic font-normal text-white/90 text-xl">세포 분석 결과서</span>
             </h1>
         </div>
 
-        <div class="envelope-container" onclick="openLetter()">
+        <!-- Envelope Middle -->
+        <div class="envelope-container z-10" onclick="openLetter()">
             <div class="envelope" id="envelope">
                 <div class="flap"></div>
                 <div class="wax-seal animate-pulse-gold">
@@ -176,24 +181,29 @@
                         <p class="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Official Document</p>
                     </div>
                 </div>
-                <!-- Envelope Body Texture -->
                 <div class="absolute bottom-5 text-white/10 text-[9px] tracking-[0.3em] font-serif">CONFIDENTIAL</div>
             </div>
         </div>
 
-        <p class="text-white/40 text-xs mt-16 animate-pulse tracking-widest font-light">터치하여 봉투를 열어주세요</p>
+        <!-- Text Bottom -->
+        <p class="text-white/40 text-xs mt-4 animate-pulse tracking-widest font-light z-10">
+            <i class="fas fa-fingerprint mr-2"></i>터치하여 봉투를 열어주세요
+        </p>
+
+        <!-- Background Glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-hb-gold/5 blur-[80px] rounded-full pointer-events-none"></div>
     </div>
 
     <!-- SCENE 2: THE REPORT (Paper) -->
-    <div id="scene-report" class="scene hidden">
-        <div class="report-paper shadow-2xl relative custom-scroll animate-slide-up-paper">
+    <div id="scene-report" class="scene hidden p-0">
+        <div class="report-paper shadow-2xl relative custom-scroll animate-slide-up-paper w-full h-full">
             
             <!-- Paper Header -->
-            <div class="text-center pt-16 pb-10 px-6 bg-white border-b border-hb-gold/10">
-                <div class="w-14 h-14 mx-auto mb-4 border border-hb-gold/50 rounded-full flex items-center justify-center text-hb-green bg-hb-paper">
+            <div class="text-center pt-12 pb-8 px-6 bg-white border-b border-hb-gold/10">
+                <div class="w-14 h-14 mx-auto mb-4 border border-hb-gold/50 rounded-full flex items-center justify-center text-hb-green bg-hb-paper shadow-sm">
                     <i class="fas fa-seedling text-2xl"></i>
                 </div>
-                <p class="text-hb-gold font-eng text-[10px] tracking-[0.3em] font-bold uppercase mb-3">Heart Village Lab</p>
+                <p class="text-hb-gold font-eng text-[10px] tracking-[0.3em] font-bold uppercase mb-2">Heart Village Lab</p>
                 <h1 class="font-serif text-2xl text-hb-green font-bold mb-2 tracking-wide">세포 건강 성적표</h1>
                 <div class="flex justify-center items-center gap-3 mt-4 text-xs text-gray-400 font-serif">
                     <span>수신: 백해림 (55세)</span>
@@ -203,13 +213,13 @@
             </div>
 
             <!-- Content Body -->
-            <div class="px-6 md:px-10 pb-16 pt-10 space-y-10 animate-fade-in-content bg-[#fdfbf7]">
+            <div class="px-6 md:px-8 pb-16 pt-8 space-y-8 animate-fade-in-content bg-[#fdfbf7]">
                 
                 <!-- 1. The Warning (Expanded & Structured) -->
                 <div>
-                    <h2 class="font-serif text-lg text-hb-red font-bold mb-6 flex items-center border-b border-hb-red/20 pb-2">
+                    <h2 class="font-serif text-lg text-hb-red font-bold mb-4 flex items-center border-b border-hb-red/20 pb-2">
                         <i class="fas fa-exclamation-circle mr-2 text-hb-red"></i> 
-                        원장님의 긴급 경고 : 장독(腸毒)의 확산
+                        원장님의 긴급 경고
                     </h2>
                     
                     <p class="text-gray-600 text-sm leading-relaxed mb-6 font-light">
@@ -245,8 +255,8 @@
                         </div>
 
                         <!-- Extra Issue -->
-                        <div class="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <h3 class="text-sm font-bold text-yellow-800 mb-1"><i class="fas fa-bone mr-1"></i> 추가 위험: 칼슘 부족 & 결석</h3>
+                        <div class="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200 shadow-sm">
+                            <h3 class="text-sm font-bold text-yellow-800 mb-1 flex items-center"><i class="fas fa-bone mr-2"></i> 추가 위험: 칼슘 결핍</h3>
                             <p class="text-xs text-yellow-700 leading-relaxed">
                                 뼈에서 칼슘이 다 빠져나가고 있습니다. 그 칼슘 찌꺼기들이 몸속을 돌아다니며 돌(결석)을 만들고 있습니다.
                             </p>
@@ -264,36 +274,36 @@
                         촌장의 힐링 처방전
                     </h2>
                     
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-6">
                         <!-- Prescription 1: Diet -->
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-10 h-10 bg-hb-green/10 rounded-full flex items-center justify-center text-hb-green">
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-hb-green/10 rounded-full flex items-center justify-center text-hb-green mt-1">
                                 <i class="fas fa-utensils"></i>
                             </div>
                             <div>
                                 <h3 class="font-bold text-hb-dark text-sm">1. 식단 혁명: "싱겁게 드시지 마세요"</h3>
                                 <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                    고객님께 저염식은 <strong>재앙</strong>입니다. 좋은 소금과 짭짤한 반찬으로 소화액을 만들어야 가스가 빠지고, 심장이 뛸 힘을 얻습니다. (탄수화물은 줄이고, 반찬은 마음껏!)
+                                    고객님께 저염식은 <strong>재앙</strong>입니다. 좋은 소금과 짭짤한 반찬으로 소화액을 만들어야 가스가 빠지고, 심장이 뛸 힘을 얻습니다. (탄수화물 ↓, 반찬 ↑)
                                 </p>
                             </div>
                         </div>
 
                         <!-- Prescription 2: Habit -->
-                        <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-10 h-10 bg-hb-gold/10 rounded-full flex items-center justify-center text-hb-gold">
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-hb-gold/10 rounded-full flex items-center justify-center text-hb-gold mt-1">
                                 <i class="fas fa-temperature-high"></i>
                             </div>
                             <div>
                                 <h3 class="font-bold text-hb-dark text-sm">2. 체온 올리기: "심장을 도와주세요"</h3>
                                 <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                    심장이 약해 손발과 배가 찹니다. 약보다 중요한 건 <strong>심부체온 올리기(원적외선 설렘돔)</strong>와 <strong>냉기제거</strong>입니다. 몸이 따뜻해야 굳어가는 근육이 풀립니다.
+                                    약보다 중요한 건 <strong>심부체온 올리기(설렘돔)</strong>와 <strong>냉기제거</strong>입니다. 몸이 따뜻해야 굳어가는 근육이 풀립니다.
                                 </p>
                             </div>
                         </div>
 
                          <!-- Prescription 3: Soft Nudge -->
-                         <div class="flex gap-4">
-                            <div class="flex-shrink-0 w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-hb-red">
+                         <div class="flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-hb-red mt-1">
                                 <i class="fas fa-calendar-check"></i>
                             </div>
                             <div>
@@ -309,24 +319,24 @@
                 <!-- 3. The Mission -->
                 <div class="text-center pt-4">
                     <p class="font-serif text-gray-400 text-xs tracking-widest uppercase mb-3">Today's Mission</p>
-                    <div class="inline-block border border-dashed border-hb-green px-8 py-4 rounded-full bg-[#f0fdf4] text-hb-green font-bold text-sm shadow-sm">
+                    <div class="inline-block border border-dashed border-hb-green px-8 py-4 rounded-full bg-[#f0fdf4] text-hb-green font-bold text-sm shadow-sm w-full">
                         🍵 매일 아침, 따뜻한 해죽순 차 마시기
                     </div>
 
-                    <div class="relative p-6 bg-white border border-gray-200 rounded-lg mt-10 text-left">
+                    <div class="relative p-6 bg-white border border-gray-200 rounded-lg mt-10 text-left shadow-md">
                         <i class="fas fa-quote-left absolute top-4 left-4 text-gray-200 text-2xl"></i>
-                        <p class="text-sm text-gray-600 italic leading-relaxed mb-4 font-serif pl-6">
+                        <p class="text-sm text-gray-600 italic leading-relaxed mb-4 font-serif pl-4 pt-2">
                             "백해림 님, 원장님께서 심장과 뇌 쪽 흐름을 많이 걱정하셨습니다.<br>
                             하지만 너무 겁먹지 마세요. 원인을 알았으니 고칠 수 있습니다.<br>
-                            언제든 편하게 족욕하러 오세요."
+                            오늘 처방해 드린 내용 꼭 기억하시고, 언제든 편하게 족욕하러 오세요."
                         </p>
-                        <div class="flex justify-end items-center gap-4 mt-6">
+                        <div class="flex justify-end items-center gap-3 mt-6 border-t border-gray-100 pt-4">
                             <div class="text-right">
                                 <p class="text-[10px] text-gray-400 uppercase tracking-widest">Health Mentor</p>
-                                <p class="font-serif font-bold text-hb-green">하트빌리지 촌장 올림</p>
+                                <p class="font-serif font-bold text-hb-green text-sm">하트빌리지 촌장 올림</p>
                             </div>
                             <!-- Stamp -->
-                            <div class="w-16 h-16 border-2 border-hb-red rounded-full flex items-center justify-center text-hb-red font-bold text-[10px] transform rotate-[-15deg] opacity-60 font-serif" style="border-style: double;">
+                            <div class="w-14 h-14 border-2 border-hb-gold rounded-full flex items-center justify-center text-hb-gold font-bold text-[10px] transform rotate-[-15deg] opacity-60 font-serif" style="border-style: double;">
                                 CARE<br>PROMISE
                             </div>
                         </div>
@@ -334,10 +344,10 @@
                 </div>
 
                 <!-- Save Button -->
-                <button onclick="saveReport()" class="w-full py-4 mt-8 bg-hb-green text-white text-xs font-bold rounded-lg shadow-lg hover:bg-black transition flex items-center justify-center gap-2">
+                <button onclick="saveReport()" class="w-full py-4 mt-8 bg-hb-green text-white text-xs font-bold rounded-xl shadow-lg hover:bg-black transition flex items-center justify-center gap-2">
                     <i class="fas fa-download"></i> 이 리포트를 이미지로 저장하기
                 </button>
-                <p class="text-[10px] text-center text-gray-400 mt-2">저장 후 카카오톡으로 보내주세요.</p>
+                <p class="text-[10px] text-center text-gray-400 mt-2 pb-8">저장 후 카카오톡으로 보내주세요.</p>
 
             </div>
         </div>
@@ -367,20 +377,31 @@
 
         function saveReport() {
             const target = document.querySelector('.report-paper');
+            const btn = document.querySelector('button[onclick="saveReport()"]');
+            const hint = btn.nextElementSibling;
+
+            // Hide button for screenshot
+            btn.style.display = 'none';
+            hint.style.display = 'none';
             
             // Temporary style adjustment for better capture
             const originalOverflow = target.style.overflow;
             target.style.overflow = 'visible';
             target.style.height = 'auto';
+            target.style.width = '100%'; // Ensure full width capture
             
             html2canvas(target, { 
                 scale: 2,
                 backgroundColor: '#fdfbf7',
-                useCORS: true 
+                useCORS: true,
+                width: target.scrollWidth, // Capture full width
+                height: target.scrollHeight // Capture full height
             }).then(canvas => {
                 // Restore styles
                 target.style.overflow = originalOverflow;
                 target.style.height = '100%';
+                btn.style.display = 'flex';
+                hint.style.display = 'block';
 
                 const link = document.createElement('a');
                 link.download = '백해림님_세포리포트.png';
