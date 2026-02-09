@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>하트빌리지 프라이빗 리포트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&family=Great+Vibes&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hb-green': '#1a2e1b', /* Deep Forest Green */
+                        'hb-gold': '#c5a059',   /* Muted Luxury Gold */
+                        'hb-paper': '#fdfbf7',  /* Warm Paper */
+                        'hb-red': '#8a1c1c',    /* Alert Red */
+                        'hb-charcoal': '#2d2d2d',
+                    },
+                    fontFamily: {
+                        serif: ['"Noto Serif KR"', 'serif'],
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                        hand: ['"Great Vibes"', 'cursive'],
+                        eng: ['"Cinzel"', 'serif'],
+                    },
+                    animation: {
+                        'pulse-gold': 'pulseGold 2s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-up-paper': 'slideUpPaper 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                        'fade-in-content': 'fadeIn 1s ease-out forwards 0.8s',
+                    },
+                    keyframes: {
+                        pulseGold: {
+                            '0%, 100%': { boxShadow: '0 0 0 0 rgba(197, 160, 89, 0.4)' },
+                            '70%': { boxShadow: '0 0 0 15px rgba(197, 160, 89, 0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUpPaper: {
+                            '0%': { transform: 'translateY(120%) scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0a0c0b; overflow: hidden; height: 100vh; width: 100vw; display: flex; flex-direction: column; }
+        
+        /* SCENE CONTROLLER */
+        .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 1s ease-in-out; padding: 20px; }
+        .scene-hidden { opacity: 0; pointer-events: none; z-index: -1; transform: scale(1.1); filter: blur(10px); }
+        
+        /* ENVELOPE STYLES (Vertical Optimized) */
+        .envelope-container { 
+            perspective: 1000px; 
+            width: 80vw; /* Responsive Width */
+            max-width: 320px;
+            aspect-ratio: 1.4 / 1; /* Maintain Ratio */
+            position: relative; 
+            cursor: pointer; 
+            margin: 40px 0; /* Spacing */
+        }
+        .envelope {
+            position: relative; width: 100%; height: 100%; background: #1a2e1b;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7); border-radius: 8px;
+            transform-style: preserve-3d; transition: transform 0.6s;
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .envelope::before { /* Texture */
+            content: ''; position: absolute; inset: 0; 
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .flap {
+            position: absolute; top: 0; left: 0; width: 100%; height: 52%;
+            background: #233d25; transform-origin: top; transition: transform 0.6s 0.2s, z-index 0.2s;
+            z-index: 10; clip-path: polygon(0 0, 50% 100%, 100% 0);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .envelope.open .flap { transform: rotateX(180deg); z-index: 0; }
+        
+        .wax-seal {
+            width: 60px; height: 60px; 
+            background: radial-gradient(circle at 30% 30%, #e6cf8b, #c5a059, #8a6e30);
+            border-radius: 50%; position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.4);
+            display: flex; justify-content: center; align-items: center;
+            border: 3px solid #8a6e30; transition: all 0.3s;
+        }
+        .wax-seal i { font-size: 24px; color: #423210; filter: drop-shadow(0 1px 0 rgba(255,255,255,0.3)); }
+        .envelope:hover .wax-seal { transform: translate(-50%, -50%) scale(1.1); }
+        .envelope.open .wax-seal { opacity: 0; transform: translate(-50%, -50%) scale(1.5); pointer-events: none; }
+
+        .letter-preview {
+            position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
+            background: #fdfbf7; border-radius: 4px; z-index: 5;
+            transform: translateY(30px) scale(0.9); transition: transform 0.8s 0.5s; opacity: 0;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;
+        }
+        .envelope.open .letter-preview { transform: translateY(-120%) scale(1); opacity: 0; /* Fade out as it opens */ }
+
+        /* REPORT PAPER STYLES */
+        .report-paper {
+            background-color: #fdfbf7; width: 100%; height: 100%;
+            overflow-y: auto; position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #c5a059; border-radius: 2px; }
+
+        /* Typography */
+        .intro-text-gradient {
+            background: linear-gradient(135deg, #fdf6d8 0%, #d4af37 50%, #8a6e30 100%);
+            -webkit-background-clip: text; color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        /* Section Decor */
+        .section-divider {
+            display: flex; align-items: center; justify-content: center; margin: 30px 0;
+        }
+        .section-divider::before, .section-divider::after {
+            content: ''; height: 1px; width: 60px; background: #c5a059; margin: 0 15px; opacity: 0.5;
+        }
+        .section-divider i { color: #c5a059; font-size: 14px; }
+
+        /* Diagnosis List - Bigger Fonts */
+        .diagnosis-step {
+            position: relative; padding-left: 25px; margin-bottom: 30px;
+        }
+        .diagnosis-step::before {
+            content: ''; position: absolute; left: 0; top: 12px; bottom: -20px;
+            width: 2px; background: #e5e7eb;
+        }
+        .diagnosis-step:last-child::before { display: none; }
+        .dot-indicator {
+            position: absolute; left: -5px; top: 12px; width: 12px; height: 12px;
+            border-radius: 50%; background: #fff; border: 3px solid;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCENE 1: THE ENVELOPE -->
+    <div id="scene-envelope" class="scene bg-[url('https://www.transparenttextures.com/patterns/black-felt.png')]">
+        
+        <!-- Text Top -->
+        <div class="text-center animate-fade-in z-10 mt-[-40px]">
+            <p class="text-hb-gold font-eng text-[10px] tracking-[0.3em] uppercase mb-4 opacity-80">Private Consulting Report</p>
+            <h1 class="font-serif text-3xl leading-relaxed tracking-wide font-light text-white">
+                <span class="font-bold intro-text-gradient text-4xl block mb-2">반규림</span> 님께 도착한<br>
+                <span class="italic font-normal text-white/90 text-xl">세포 분석 결과서</span>
+            </h1>
+        </div>
+
+        <!-- Envelope Middle -->
+        <div class="envelope-container z-10" onclick="openLetter()">
+            <div class="envelope" id="envelope">
+                <div class="flap"></div>
+                <div class="wax-seal animate-pulse-gold">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="letter-preview shadow-xl flex items-center justify-center border border-gray-100">
+                    <div class="text-center">
+                        <p class="font-eng text-hb-green font-bold text-lg tracking-widest">HEART VILLAGE</p>
+                        <p class="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Official Document</p>
+                    </div>
+                </div>
+                <!-- Envelope Body Texture -->
+                <div class="absolute bottom-5 text-white/10 text-[9px] tracking-[0.3em] font-serif">CONFIDENTIAL</div>
+            </div>
+        </div>
+
+        <!-- Text Bottom -->
+        <p class="text-white/40 text-xs mt-4 animate-pulse tracking-widest font-light z-10">
+            <i class="fas fa-fingerprint mr-2"></i>터치하여 봉투를 열어주세요
+        </p>
+
+        <!-- Background Glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-hb-gold/5 blur-[80px] rounded-full pointer-events-none"></div>
+    </div>
+
+    <!-- SCENE 2: THE REPORT (Paper) -->
+    <div id="scene-report" class="scene hidden p-0">
+        <div class="report-paper shadow-2xl relative custom-scroll animate-slide-up-paper w-full h-full">
+            
+            <!-- Paper Header -->
+            <div class="text-center pt-12 pb-8 px-6 bg-white border-b border-hb-gold/10">
+                <div class="w-14 h-14 mx-auto mb-4 border border-hb-gold/50 rounded-full flex items-center justify-center text-hb-green bg-hb-paper shadow-sm">
+                    <i class="fas fa-seedling text-2xl"></i>
+                </div>
+                <p class="text-hb-gold font-eng text-[10px] tracking-[0.3em] font-bold uppercase mb-2">Heart Village Lab</p>
+                <h1 class="font-serif text-2xl text-hb-green font-bold mb-2 tracking-wide">세포 건강 성적표</h1>
+                <div class="flex justify-center items-center gap-3 mt-4 text-sm text-gray-500 font-serif">
+                    <span>수신: 반규림 (65세)</span>
+                    <span class="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+                    <span>2026. 02. 06</span>
+                </div>
+            </div>
+
+            <!-- Content Body -->
+            <div class="px-6 md:px-8 pb-16 pt-8 space-y-10 animate-fade-in-content bg-[#fdfbf7]">
+                
+                <!-- 1. The Warning (Personalized for Ban Gyurim - Shock Therapy) -->
+                <div>
+                    <h2 class="font-serif text-xl text-hb-red font-bold mb-4 flex items-center border-b-2 border-hb-red/20 pb-2">
+                        <i class="fas fa-exclamation-circle mr-2 text-hb-red"></i> 
+                        원장님의 긴급 경고
+                    </h2>
+                    
+                    <p class="text-gray-700 text-base leading-relaxed mb-6 font-medium">
+                        "반규림 님, 남을 위해 사시느라 몸이 <strong>종합병동 직전</strong>입니다. 지금 돈 아끼려다 나중엔 <strong>병원비로 집 한 채</strong> 날릴 수 있는 위험한 상태입니다."
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <!-- Signal 1: Brain & Stroke -->
+                        <div class="diagnosis-step">
+                            <div class="dot-indicator border-hb-red bg-red-100"></div>
+                            <h3 class="text-lg font-bold text-hb-red">🚨 뇌혈관 & 풍(中風) 위험</h3>
+                            <div class="mt-2 text-sm text-gray-700 leading-relaxed bg-red-50 p-4 rounded-lg border border-red-200 shadow-sm">
+                                <ul class="list-disc list-inside space-y-2">
+                                    <li><strong>뇌 독소:</strong> 장에서 발생한 가스가 척추를 타고 뇌를 공격 중입니다.</li>
+                                    <li><strong>풍 전조증상:</strong> 공막 혈관이 꺾여있습니다. 언제 쓰러져도 이상하지 않은 <strong>시한폭탄</strong> 상태입니다.</li>
+                                    <li><strong>목 혈관:</strong> 뇌로 가는 길이 꽉 막혀있습니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Signal 2: Gut & Organs -->
+                        <div class="diagnosis-step">
+                            <div class="dot-indicator border-hb-gold bg-yellow-100"></div>
+                            <h3 class="text-lg font-bold text-hb-charcoal">⚠️ 썩어가는 장 & 게실염</h3>
+                            <div class="mt-2 text-sm text-gray-600 leading-relaxed">
+                                <ul class="list-disc list-inside space-y-2 ml-1">
+                                    <li><strong>게실 투성이:</strong> 장벽이 늘어나 주머니(게실)가 생겼고, 그 안에 <strong>오래된 똥독</strong>이 가득 차 썩고 있습니다.</li>
+                                    <li><strong>직장/자궁 압박:</strong> 독소가 직장 충열과 자궁 물혹, 역류성 식도염까지 만들고 있습니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Signal 3: Bone & Lungs -->
+                        <div class="diagnosis-step">
+                            <div class="dot-indicator border-gray-400 bg-gray-200"></div>
+                            <h3 class="text-lg font-bold text-gray-800">⚠️ 무너진 기둥 (뼈 & 폐)</h3>
+                            <div class="mt-2 text-sm text-gray-600 leading-relaxed">
+                                <ul class="list-disc list-inside space-y-2 ml-1">
+                                    <li><strong>골밀도 붕괴:</strong> 뼈에 구멍이 숭숭 뚫려 고관절, 무릎, 허리가 무너지고 있습니다.</li>
+                                    <li><strong>폐/기관지:</strong> 선천적으로 약한데 독소까지 차서 숨쉬기가 힘들어질 것입니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="section-divider"><i class="fas fa-leaf text-lg"></i></div>
+
+                <!-- 2. The Solution (Empress Targeted) -->
+                <div>
+                    <h2 class="font-serif text-xl text-hb-green font-bold mb-6 flex items-center border-b-2 border-hb-green/20 pb-2">
+                        <i class="fas fa-prescription-bottle-alt mr-2"></i> 
+                        촌장의 힐링 처방전
+                    </h2>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 space-y-8">
+                        <!-- Prescription 1: Sweat -->
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-hb-gold/10 rounded-full flex items-center justify-center text-hb-gold mt-1">
+                                <i class="fas fa-temperature-high text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-hb-dark text-lg">1. 강제 배출: "땀으로 짜내야 합니다"</h3>
+                                <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                                    장 게실에 박힌 썩은 찌꺼기는 약으로만 안 나갑니다. 심부 체온을 높여 땀구멍으로 <span class="bg-yellow-100 px-1 font-bold text-hb-dark">강제 배출</span>시켜야만 뇌와 뼈가 살아납니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Prescription 2: Empress -->
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-hb-green/10 rounded-full flex items-center justify-center text-hb-green mt-1">
+                                <i class="fas fa-crown text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-hb-dark text-lg">2. 강력 추천: [더 엠프레스]</h3>
+                                <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                                    돈 걱정은 나중에 하세요. 약 끊고 <strong>10년 젊어지는 유일한 길</strong>입니다. 이번엔 오직 <strong class="text-hb-green border-b-2 border-hb-green">나를 살리는 일</strong>에만 집중하세요.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. The Mission (Pressure & Success) -->
+                <div class="text-center pt-6">
+                    <p class="font-serif text-gray-500 text-sm tracking-widest uppercase mb-3">Today's Mission</p>
+                    
+                    <div class="inline-block border-2 border-dashed border-hb-green px-6 py-6 rounded-2xl bg-[#f0fdf4] text-hb-green text-base shadow-sm w-full">
+                        <p class="font-bold mb-3 text-xl text-hb-dark"><i class="fas fa-capsules mr-2 text-hb-green"></i>3일 '메가 요법' 챌린지</p>
+                        
+                        <div class="bg-white rounded-lg p-4 border border-hb-green/20 text-center mb-3">
+                            <p class="text-sm text-gray-600 mb-2">가져가신 <strong>[생유+비타몬]</strong>을 아끼지 말고 부으세요!</p>
+                            <div class="flex justify-center items-center gap-2 text-sm font-bold text-hb-green font-mono">
+                                <span>아침 3포</span> <i class="fas fa-chevron-right text-gray-300"></i>
+                                <span>점심 3포</span> <i class="fas fa-chevron-right text-gray-300"></i>
+                                <span>저녁 4포</span>
+                            </div>
+                            <p class="text-sm text-red-600 mt-3 font-bold bg-red-50 p-2 rounded">* 이거라도 제대로 드셔야 '작은 성공'이라도 봅니다.</p>
+                        </div>
+                        
+                        <p class="text-sm mt-2 text-hb-green/80 font-bold animate-pulse">
+                            지금 장 속 유해균이 강력 분해되고 있습니다...
+                        </p>
+                    </div>
+
+                    <div class="relative p-8 bg-white border border-gray-200 rounded-xl mt-10 text-left shadow-lg">
+                        <i class="fas fa-quote-left absolute top-6 left-6 text-gray-200 text-3xl"></i>
+                        <p class="text-base text-gray-700 italic leading-relaxed mb-6 font-serif pl-6 pt-2">
+                            "반규림 님, 돈은 있다가도 없는 것이지만,<br>
+                            무너진 뼈와 뇌 건강은 타이밍을 놓치면<br>
+                            <strong>억만금을 줘도 못 삽니다.</strong><br><br>
+                            이 8만원의 기적을 먼저 체험해보세요.<br>
+                            65세 인생 중 가장 젊은 날을 돌려드리겠습니다."
+                        </p>
+                        <div class="flex justify-end items-center gap-3 mt-6 border-t border-gray-100 pt-4">
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500 uppercase tracking-widest">Health Mentor</p>
+                                <p class="font-serif font-bold text-hb-green text-base">하트빌리지 촌장 올림</p>
+                            </div>
+                            <!-- Stamp -->
+                            <div class="w-16 h-16 border-4 border-hb-gold rounded-full flex items-center justify-center text-hb-gold font-bold text-xs transform rotate-[-15deg] opacity-70 font-serif" style="border-style: double;">
+                                CARE<br>PROMISE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button onclick="saveReport()" class="w-full py-5 mt-10 bg-hb-green text-white text-sm font-bold rounded-xl shadow-xl hover:bg-black transition flex items-center justify-center gap-2">
+                    <i class="fas fa-download"></i> 이 리포트를 이미지로 저장하기
+                </button>
+                <p class="text-xs text-center text-gray-500 mt-3 pb-10">저장 후 카카오톡으로 보내주세요.</p>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLetter() {
+            const envelope = document.getElementById('envelope');
+            const sceneEnvelope = document.getElementById('scene-envelope');
+            const sceneReport = document.getElementById('scene-report');
+
+            // 1. Open Flap
+            envelope.classList.add('open');
+
+            // 2. Transition Scene
+            setTimeout(() => {
+                sceneEnvelope.style.opacity = '0';
+                
+                setTimeout(() => {
+                    sceneEnvelope.style.display = 'none';
+                    sceneReport.classList.remove('hidden');
+                    // Force reflow
+                    void sceneReport.offsetWidth; 
+                }, 800);
+            }, 1000);
+        }
+
+        function saveReport() {
+            const target = document.querySelector('.report-paper');
+            const btn = document.querySelector('button[onclick="saveReport()"]');
+            const hint = btn.nextElementSibling;
+
+            // Hide button for screenshot
+            btn.style.display = 'none';
+            hint.style.display = 'none';
+            
+            // Temporary style adjustment for better capture
+            const originalOverflow = target.style.overflow;
+            target.style.overflow = 'visible';
+            target.style.height = 'auto';
+            target.style.width = '100%'; 
+            
+            html2canvas(target, { 
+                scale: 2,
+                backgroundColor: '#fdfbf7',
+                useCORS: true,
+                width: target.scrollWidth,
+                height: target.scrollHeight
+            }).then(canvas => {
+                // Restore styles
+                target.style.overflow = originalOverflow;
+                target.style.height = '100%';
+                btn.style.display = 'flex';
+                hint.style.display = 'block';
+
+                const link = document.createElement('a');
+                link.download = '반규림님_세포리포트.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
